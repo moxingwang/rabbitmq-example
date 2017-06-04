@@ -1,4 +1,4 @@
-package com.mo.redis.mapper;
+package com.mo.test.mapper;
 
 /**
  * Created by MoXingwang on 2017/6/4.
