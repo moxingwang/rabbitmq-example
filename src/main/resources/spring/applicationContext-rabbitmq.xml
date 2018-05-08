@@ -29,4 +29,15 @@
     <rabbit:template id="messageDelayAmqpTemplate" exchange="messageDelayExchange" connection-factory="connectionFactory" routing-key="trade.order.message.delay"/>
 
 
+    <bean id="messageListener" class=" com.mo.test.rabbit.MessageListener"/>
+
+    <rabbit:listener-container
+            connection-factory="connectionFactory"
+            acknowledge="manual"
+            channel-transacted="false"
+            message-converter="jsonMessageConverter">
+        <rabbit:listener queues="messageDelayQueue" ref="messageListener"  method="onMessage"/>
+    </rabbit:listener-container>
+
+
 </beans>
