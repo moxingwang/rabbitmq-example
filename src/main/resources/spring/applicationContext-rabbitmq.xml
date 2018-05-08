@@ -13,15 +13,17 @@
     <rabbit:admin id="admin1" connection-factory="connectionFactory"/>
 
 
-    <rabbit:queue id="longyan" name="${rabbitmq.mq.trade.oc.longyan}" durable="true" auto-delete="false" exclusive="false" declared-by="admin1"/>
+    <rabbit:queue id="messageDelayQueue" name="messageDelayQueue" durable="true" auto-delete="false" exclusive="false" declared-by="admin1">
 
-    <rabbit:direct-exchange id="longyanAsync" name="longyanAsync" durable="true" auto-delete="false" declared-by="admin2">
+    </rabbit:queue>
+
+    <rabbit:direct-exchange id="messageDelayExchange" name="messageDelayExchange" durable="true" auto-delete="false" declared-by="admin2">
         <rabbit:bindings>
-            <rabbit:binding queue="longyan"></rabbit:binding>
+            <rabbit:binding queue="messageDelayQueue"/>
         </rabbit:bindings>
     </rabbit:direct-exchange>
 
-    <rabbit:template id="testAmqpTemplate" exchange="longyanAsync" connection-factory="connectionFactory" routing-key="test"/>
+    <rabbit:template id="messageDelayAmqpTemplate" exchange="messageDelayExchange" connection-factory="connectionFactory" routing-key="trade.order.message.delay"/>
 
 
 </beans>
