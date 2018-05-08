@@ -8,10 +8,10 @@
      http://www.springframework.org/schema/rabbit
      http://www.springframework.org/schema/rabbit/spring-rabbit-1.7.xsd">
 
-    <bean id="jsonMessageConverter" class="org.springframework.amqp.support.converter.JsonMessageConverter"></bean>
+   <!-- <bean id="jsonMessageConverter" class="org.springframework.amqp.support.converter.JsonMessageConverter"></bean>
 
 
-    <!--virtual host /trade-->
+    &lt;!&ndash;virtual host /trade&ndash;&gt;
     <rabbit:connection-factory id="connectionFactory" addresses="mq201.dev.rs.com:5672,mq202.dev.rs.com:5672" username="dev" password="dev_user" virtual-host="/trade"/>
     <rabbit:admin id="admin1" connection-factory="connectionFactory"/>
 
@@ -20,13 +20,14 @@
 
     </rabbit:queue>
 
-    <rabbit:topic-exchange id="messageDelayExchange" name="messageDelayExchange" durable="true" auto-delete="false" declared-by="admin1">
+    <rabbit:direct-exchange id="messageDelayExchange" name="messageDelayExchange" durable="true" auto-delete="false" declared-by="admin1">
         <rabbit:bindings>
-            <rabbit:binding queue="messageDelayQueue" pattern="order.delay.notify"/>
+            <rabbit:binding queue="messageDelayQueue" />
+            &lt;!&ndash;<rabbit:binding queue="messageDelayQueue" pattern="order.delay.notify"/>&ndash;&gt;
         </rabbit:bindings>
-    </rabbit:topic-exchange>
+    </rabbit:direct-exchange>
 
-    <rabbit:template id="messageDelayAmqpTemplate" exchange="messageDelayExchange" connection-factory="connectionFactory" routing-key="trade.order.message.delay"/>
+    <rabbit:template id="messageDelayAmqpTemplate" exchange="messageDelayExchange" connection-factory="connectionFactory" routing-key="order.delay.notify"/>
 
 
     <bean id="messageListener" class=" com.mo.test.rabbit.MessageListener"/>
@@ -39,5 +40,60 @@
         <rabbit:listener queues="messageDelayQueue" ref="messageListener" method="onMessage"/>
     </rabbit:listener-container>
 
+    -->
+
+
+    <rabbit:connection-factory id="connectionFactory" addresses="mq201.dev.rs.com:5672,mq202.dev.rs.com:5672" username="dev" password="dev_user" virtual-host="/trade"/>
+
+    <rabbit:admin connection-factory="connectionFactory" />
+    <rabbit:queue name="test_queue" durable="true" auto-delete="false" exclusive="false" />
+
+    <rabbit:queue name="test_delay_queue" durable="true" auto-delete="false" exclusive="false">
+        <rabbit:queue-arguments>
+            <entry key="x-message-ttl">
+                <value  type="java.lang.Long">6000</value>
+            </entry>
+            <entry key="x-dead-letter-exchange" value="amqpExchange"/>
+        </rabbit:queue-arguments>
+    </rabbit:queue>
+    <!-- 消息对象json转换类 -->
+    <bean id="jsonMessageConverter"
+          class="org.springframework.amqp.support.converter.Jackson2JsonMessageConverter" />
+
+
+    <!-- rabbit:direct-exchange：定义exchange模式为direct， 意思就是消息与一个特定的路由键完全匹配，才会转发。
+            rabbit:binding：设置消息queue匹配的key -->
+    <rabbit:fanout-exchange name="amqpDelayExchange"
+                            durable="true" auto-delete="false" id="amqpDelayExchange">
+        <rabbit:bindings>
+            <rabbit:binding queue="test_delay_queue"/>
+        </rabbit:bindings>
+
+    </rabbit:fanout-exchange>
+
+    <rabbit:direct-exchange name="amqpExchange"      durable="true" auto-delete="false" id="amqpExchange">
+        <rabbit:bindings>
+            <rabbit:binding queue="test_queue" key="test" />
+        </rabbit:bindings>
+
+    </rabbit:direct-exchange>
+
+
+    <!-- spring template声明 -->
+    <rabbit:template exchange="amqpExchange" id="amqpTemplate"
+                     connection-factory="connectionFactory" message-converter="jsonMessageConverter" />
+
+
+
+    <!-- 测试队列 -->
+    <bean id="testConsumer"  class="com.mo.test.rabbit.MessageListener"/>
+
+    <rabbit:listener-container
+            connection-factory="connectionFactory"
+            acknowledge="manual"
+            channel-transacted="false"
+            message-converter="jsonMessageConverter">
+        <rabbit:listener queues="test_queue" ref="testConsumer" method="onMessage"/>
+    </rabbit:listener-container>
 
 </beans>

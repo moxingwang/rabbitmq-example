@@ -19,24 +19,26 @@ public class MessageProducerService {
     private static Logger logger = LoggerFactory.getLogger(MessageProducerService.class);
 
     @Autowired
-    @Qualifier("messageDelayAmqpTemplate")
+//    @Qualifier("messageDelayAmqpTemplate")
     private RabbitTemplate amqpTemplate;
 
     public void sendMessage(Object message) {
         final int xdelay = 60000;
         //发送延迟消息
-        amqpTemplate.convertAndSend("order.delay.notify", message,
+    /*    amqpTemplate.convertAndSend("amqpDelayExchange", message,
                 new MessagePostProcessor() {
                     @Override
                     public Message postProcessMessage(Message message)
                             throws AmqpException {
                         //设置消息持久化
-                        message.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
+                        *//*message.getMessageProperties().setDeliveryMode(MessageDeliveryMode.PERSISTENT);
                         //设置延迟时间（5分钟后执行）
-                        message.getMessageProperties().setDelay(xdelay);
+                        message.getMessageProperties().setDelay(xdelay);*//*
+                        message.getMessageProperties().setHeader("x-delay",6000);
                         return message;
                     }
-                });
+                });*/
+        amqpTemplate.convertAndSend("amqpDelayExchange", "test", "435635353");//amqpDelayExchange
     }
 
 
