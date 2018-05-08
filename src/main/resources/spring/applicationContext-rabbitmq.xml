@@ -20,7 +20,7 @@
 
     </rabbit:queue>
 
-    <rabbit:direct-exchange id="messageDelayExchange" name="messageDelayExchange" durable="true" auto-delete="false" declared-by="admin2">
+    <rabbit:direct-exchange id="messageDelayExchange" name="messageDelayExchange" durable="true" auto-delete="false" declared-by="admin1">
         <rabbit:bindings>
             <rabbit:binding queue="messageDelayQueue"/>
         </rabbit:bindings>
