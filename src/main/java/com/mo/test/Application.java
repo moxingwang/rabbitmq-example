@@ -8,8 +8,8 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.context.annotation.ImportResource;
 
-@EnableAutoConfiguration
-@SpringBootApplication(exclude = {DataSourceTransactionManagerAutoConfiguration.class, DataSourceAutoConfiguration.class})
+@EnableAutoConfiguration(exclude = {DataSourceTransactionManagerAutoConfiguration.class, DataSourceAutoConfiguration.class})
+@SpringBootApplication
 @ImportResource({"classpath:spring/*.xml"})
 public class Application {
     private static Logger logger = Logger.getLogger(Application.class);
