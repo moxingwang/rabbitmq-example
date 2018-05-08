@@ -14,29 +14,30 @@
     <rabbit:connection-factory id="connectionFactory" addresses="mq201.dev.rs.com:5672,mq202.dev.rs.com:5672" username="dev" password="dev_user" virtual-host="/trade"/>
     <rabbit:admin connection-factory="connectionFactory" />
 
-    <rabbit:queue name="test_queue" durable="true" auto-delete="false" exclusive="false" />
 
     <rabbit:queue name="test_delay_queue" durable="true" auto-delete="false" exclusive="false">
         <rabbit:queue-arguments>
             <entry key="x-message-ttl">
-                <value  type="java.lang.Long">6000</value>
+                <value  type="java.lang.Long">16000</value>
             </entry>
             <entry key="x-dead-letter-exchange" value="amqpExchange"/>
         </rabbit:queue-arguments>
     </rabbit:queue>
-
-
     <rabbit:fanout-exchange name="amqpDelayExchange" durable="true" auto-delete="false" id="amqpDelayExchange">
         <rabbit:bindings>
             <rabbit:binding queue="test_delay_queue"/>
         </rabbit:bindings>
     </rabbit:fanout-exchange>
 
+
+    <rabbit:queue name="test_queue" durable="true" auto-delete="false" exclusive="false" />
     <rabbit:direct-exchange name="amqpExchange" durable="true" auto-delete="false" id="amqpExchange">
         <rabbit:bindings>
             <rabbit:binding queue="test_queue" key="test" />
         </rabbit:bindings>
     </rabbit:direct-exchange>
+
+
 
     <rabbit:template exchange="amqpExchange" id="amqpTemplate" connection-factory="connectionFactory" message-converter="jsonMessageConverter" />
 
