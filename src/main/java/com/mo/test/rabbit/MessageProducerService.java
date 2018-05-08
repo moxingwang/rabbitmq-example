@@ -21,7 +21,7 @@ public class MessageProducerService {
     private RabbitTemplate amqpTemplate;
 
     public void sendMessage(Object message) {
-        final int xdelay = 30;
+        final int xdelay = 10000;
         //发送延迟消息
         amqpTemplate.convertAndSend("messageDelayQueue", message,
                 new MessagePostProcessor() {
