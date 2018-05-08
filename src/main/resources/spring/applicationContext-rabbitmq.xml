@@ -20,11 +20,11 @@
 
     </rabbit:queue>
 
-    <rabbit:direct-exchange id="messageDelayExchange" name="messageDelayExchange" durable="true" auto-delete="false" declared-by="admin1">
+    <rabbit:topic-exchange id="messageDelayExchange" name="messageDelayExchange" durable="true" auto-delete="false" declared-by="admin1">
         <rabbit:bindings>
-            <rabbit:binding queue="messageDelayQueue"/>
+            <rabbit:binding queue="messageDelayQueue" pattern="order.delay.notify"/>
         </rabbit:bindings>
-    </rabbit:direct-exchange>
+    </rabbit:topic-exchange>
 
     <rabbit:template id="messageDelayAmqpTemplate" exchange="messageDelayExchange" connection-factory="connectionFactory" routing-key="trade.order.message.delay"/>
 
@@ -36,7 +36,7 @@
             acknowledge="manual"
             channel-transacted="false"
             message-converter="jsonMessageConverter">
-        <rabbit:listener queues="messageDelayQueue" ref="messageListener"  method="onMessage"/>
+        <rabbit:listener queues="messageDelayQueue" ref="messageListener" method="onMessage"/>
     </rabbit:listener-container>
 
 

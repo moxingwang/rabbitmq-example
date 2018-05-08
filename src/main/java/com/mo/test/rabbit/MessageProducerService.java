@@ -8,6 +8,7 @@ import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 /**
@@ -18,12 +19,13 @@ public class MessageProducerService {
     private static Logger logger = LoggerFactory.getLogger(MessageProducerService.class);
 
     @Autowired
+    @Qualifier("messageDelayAmqpTemplate")
     private RabbitTemplate amqpTemplate;
 
     public void sendMessage(Object message) {
-        final int xdelay = 10000;
+        final int xdelay = 60000;
         //发送延迟消息
-        amqpTemplate.convertAndSend("messageDelayQueue", message,
+        amqpTemplate.convertAndSend("order.delay.notify", message,
                 new MessagePostProcessor() {
                     @Override
                     public Message postProcessMessage(Message message)

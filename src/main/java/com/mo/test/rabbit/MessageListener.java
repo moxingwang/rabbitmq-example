@@ -18,7 +18,7 @@ public class MessageListener implements ChannelAwareMessageListener {
 
     @Override
     public void onMessage(Message message, Channel channel) throws IOException {
-        logger.info("接收到的消息", JSON.toJSONString(new String(message.getBody())));
+        logger.info("接收到的消息{}", JSON.toJSONString(new String(message.getBody())));
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         logger.info("deliveryTag= " + deliveryTag);
         //手动确认
